@@ -66,7 +66,7 @@ KCM.SimpleKCM {
             Layout.maximumWidth: Kirigami.Units.gridUnit * 22
             wrapMode: Text.WordWrap
             font: Kirigami.Theme.smallFont
-            text: "Right-click opens this tray widget through its \"activate widget N\" global shortcut. 0 means not set up: right-click then just shows the widget menu. setup-right-click.sh fills this in."
+            text: "Right-click opens this tray widget through its \"activate widget N\" global shortcut. 0 means not set up: right-click then just offers Configure. setup.sh (run by install.sh) fills this in."
         }
 
         QQC2.TextField {

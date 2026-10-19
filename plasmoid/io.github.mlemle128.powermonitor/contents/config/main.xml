@@ -24,7 +24,7 @@
         <entry name="showPower" type="Bool">
             <default>true</default>
         </entry>
-        <!-- 0 = not set up; run setup-right-click.sh -->
+        <!-- 0 = not set up; setup.sh fills it in -->
         <entry name="stockBatteryWidgetId" type="Int">
             <default>0</default>
         </entry>

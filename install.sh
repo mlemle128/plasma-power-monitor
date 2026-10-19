@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# install batt to ~/.local/bin and the Power Monitor widget for the current user
+# install batt to ~/.local/bin and the Power Monitor widget for the current user,
+# then put it in the system tray (setup.sh). --no-setup skips the tray part.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -14,11 +15,7 @@ else
     kpackagetool6 -t Plasma/Applet --install "plasmoid/$ID"
 fi
 
-cat <<'MSG'
-
-Next:
-  1. Right-click the system tray ^ > Configure System Tray > Entries,
-     set "Power Monitor" to "Always shown" (and optionally the stock
-     "Power and Battery" to "Shown when relevant" / "Always hidden").
-  2. Run ./setup-right-click.sh so right-click opens the stock battery popup.
-MSG
+if [ "${1:-}" != --no-setup ]; then
+    echo
+    ./setup.sh
+fi

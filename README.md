@@ -61,24 +61,28 @@ cd plasma-power-monitor
 ./install.sh
 ```
 
-Then:
+That installs `batt` and the widget, then runs `setup.sh`, which sets up
+the tray with no clicking:
 
-1. Right-click the tray's ^ → *Configure System Tray* → *Entries* and
-   set **Power Monitor** to *Always shown*.
-2. Run `./setup-right-click.sh` (add `--hide-stock` to also move the
-   stock battery icon into the ^ menu).
+- **Power Monitor** is added to the tray and set to *Always shown*.
+- The stock **Power and Battery** stays enabled but is set to *Shown only
+  in popup*, so it lives in the ^ menu.
+- Power and Battery gets the global shortcut `Meta+Ctrl+Alt+Shift+B`
+  if it has none (override with `SHORTCUT=...`), and its widget ID is
+  stored in Power Monitor's settings so right-click can open it.
 
-`setup-right-click.sh` exists because Plasma has no way for one widget
-to open another's popup except through that widget's global
-*activate widget N* shortcut. The script finds the stock battery
-widget, gives it a shortcut if it has none (default
-`Meta+Ctrl+Alt+Shift+B`, override with `SHORTCUT=...`), and stores its
-ID in Power Monitor's settings. It restarts plasmashell and backs up
-`~/.config/plasma-org.kde.plasma.desktop-appletsrc` first. Until it's
-run, right-click shows a menu with just *Configure Power Monitor…*.
+Why the shortcut: Plasma has no way for one widget to open another's
+popup except through that widget's global *activate widget N* shortcut.
 
-Removing Power Monitor from the tray (or uninstalling it) resets its
-settings, so run `setup-right-click.sh` again after adding it back.
+`setup.sh` restarts plasmashell (the panel flickers a couple of times),
+backs up `~/.config/plasma-org.kde.plasma.desktop-appletsrc` first, and
+afterwards checks no other tray item went missing. It's safe to re-run,
+and you need to after removing Power Monitor from the tray and adding it
+back, since that resets its settings. Use `./install.sh --no-setup` to
+install without touching the tray.
+
+Until setup has run, right-click shows a menu with just *Configure
+Power Monitor…*.
 
 ### Notes
 
