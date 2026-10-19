@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# batt — per-battery charging info for ThinkPads (dual battery aware)
+# usage: batt          one-shot
+#        batt -w [s]   live view, refresh every s seconds (default 5)
+
+PS=/sys/class/power_supply
+
+rd() { cat "$1" 2>/dev/null; }
+
+show() {
+    local ac=$(rd $PS/AC/online)
+    local total_p=0
+    printf 'AC: %s    %s\n\n' "$([ "$ac" = 1 ] && echo plugged in || echo on battery)" "$(date +%T)"
+    printf '%-5s %-13s %5s %15s %8s %7s %7s %6s %7s %s\n' \
+        BAT STATUS CHG ENERGY POWER VOLT HEALTH CYCLE THRESH ETA
+    for b in $PS/BAT*; do
+        [ -d "$b" ] || continue
+        local n=${b##*/} st=$(rd $b/status) cap=$(rd $b/capacity)
+        local e=$(rd $b/energy_now) ef=$(rd $b/energy_full) ed=$(rd $b/energy_full_design)
+        local p=$(rd $b/power_now) v=$(rd $b/voltage_now) cyc=$(rd $b/cycle_count)
+        local t0=$(rd $b/charge_control_start_threshold) t1=$(rd $b/charge_control_end_threshold)
+        total_p=$((total_p + ${p:-0}))
+        awk -v n="$n" -v st="$st" -v cap="$cap" -v e="$e" -v ef="$ef" -v ed="$ed" \
+            -v p="$p" -v v="$v" -v cyc="$cyc" -v t0="$t0" -v t1="$t1" 'BEGIN {
+            eta = "-"
+            if (p > 0 && st == "Charging") {
+                h = (ef * t1 / 100 - e) / p
+                if (h > 0) eta = sprintf("%dh%02dm to %d%%", int(h), int((h - int(h)) * 60), t1)
+            } else if (p > 0 && st == "Discharging") {
+                h = e / p
+                eta = sprintf("%dh%02dm left", int(h), int((h - int(h)) * 60))
+            } else if (st == "Not charging" && cap < t1) {
+                eta = (cap >= t0) ? sprintf("waits until <%d%%", t0) : "waiting turn"
+            }
+            printf "%-5s %-13s %4s%% %6.2f/%5.2fWh %7.2fW %6.2fV %6.0f%% %6s %3s-%-3s %s\n",
+                n, st, cap, e/1e6, ef/1e6, p/1e6, v/1e6, (ed > 0 ? ef/ed*100 : 0), cyc, t0, t1, eta
+        }'
+    done
+    awk -v p="$total_p" 'BEGIN { printf "\nTotal battery power: %.2fW\n", p/1e6 }'
+}
+
+if [ "$1" = -w ]; then
+    interval=${2:-5}
+    while :; do clear; show; sleep "$interval"; done
+else
+    show
+fi
