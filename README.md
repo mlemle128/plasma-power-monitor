@@ -75,7 +75,10 @@ widget, gives it a shortcut if it has none (default
 `Meta+Ctrl+Alt+Shift+B`, override with `SHORTCUT=...`), and stores its
 ID in Power Monitor's settings. It restarts plasmashell and backs up
 `~/.config/plasma-org.kde.plasma.desktop-appletsrc` first. Until it's
-run, right-click just shows the widget menu.
+run, right-click shows a menu with just *Configure Power Monitor…*.
+
+Removing Power Monitor from the tray (or uninstalling it) resets its
+settings, so run `setup-right-click.sh` again after adding it back.
 
 ### Notes
 

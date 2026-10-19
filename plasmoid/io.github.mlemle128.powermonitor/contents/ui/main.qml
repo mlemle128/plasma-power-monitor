@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import org.kde.plasma.plasmoid
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.components as PlasmaComponents3
+import org.kde.plasma.extras as PlasmaExtras
 import org.kde.plasma.plasma5support as P5Support
 import org.kde.kirigami as Kirigami
 
@@ -93,9 +94,6 @@ PlasmoidItem {
         onTriggered: root.refresh()
     }
 
-    // without a stock battery widget ID the right-click is left to plasma
-    // entirely, so a single right-click shows the widget menu
-
     // a single right-click waits out the double-click interval before opening
     // the stock popup; a second right-click inside it gets the widget menu
     Timer {
@@ -105,6 +103,8 @@ PlasmoidItem {
     }
 
     compactRepresentation: MouseArea {
+        id: compactArea
+
         // the tray doesn't size compact items for us; without these the
         // icon and click area collapse to 0×0
         implicitWidth: Kirigami.Units.iconSizes.medium
@@ -116,19 +116,36 @@ PlasmoidItem {
         acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
         onPressed: mouse => {
             // second right-click: let the press through so plasma shows the widget menu
-            if (mouse.button === Qt.RightButton
-                    && (rightClickTimer.running || root.cfg.stockBatteryWidgetId <= 0)) {
+            if (mouse.button === Qt.RightButton && rightClickTimer.running) {
                 rightClickTimer.stop()
                 mouse.accepted = false
             }
         }
         onClicked: mouse => {
-            if (mouse.button === Qt.RightButton && root.cfg.stockBatteryWidgetId > 0)
-                rightClickTimer.start()
-            else if (mouse.button === Qt.MiddleButton)
+            if (mouse.button === Qt.RightButton) {
+                if (root.cfg.stockBatteryWidgetId > 0)
+                    rightClickTimer.start()
+                else
+                    fallbackMenu.openRelative()
+            } else if (mouse.button === Qt.MiddleButton) {
                 root.showDetails = !root.showDetails
-            else
+            } else if (mouse.button === Qt.LeftButton) {
                 root.cfg.showReadout = !root.cfg.showReadout
+            }
+        }
+
+        // not set up yet (no stock battery widget ID): letting a lone right-click
+        // through to the tray doesn't reliably open the widget menu, so offer
+        // the settings ourselves
+        PlasmaExtras.Menu {
+            id: fallbackMenu
+            visualParent: compactArea
+            placement: PlasmaExtras.Menu.TopPosedLeftAlignedPopup
+
+            // deliberately no "Remove": the menu opens right under the cursor
+            PlasmaExtras.MenuItem {
+                action: Plasmoid.internalAction("configure")
+            }
         }
 
         Kirigami.Icon {
