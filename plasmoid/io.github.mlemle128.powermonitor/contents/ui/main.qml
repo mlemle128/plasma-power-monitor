@@ -93,6 +93,9 @@ PlasmoidItem {
         onTriggered: root.refresh()
     }
 
+    // without a stock battery widget ID the right-click is left to plasma
+    // entirely, so a single right-click shows the widget menu
+
     // a single right-click waits out the double-click interval before opening
     // the stock popup; a second right-click inside it gets the widget menu
     Timer {
@@ -113,13 +116,14 @@ PlasmoidItem {
         acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
         onPressed: mouse => {
             // second right-click: let the press through so plasma shows the widget menu
-            if (mouse.button === Qt.RightButton && rightClickTimer.running) {
+            if (mouse.button === Qt.RightButton
+                    && (rightClickTimer.running || root.cfg.stockBatteryWidgetId <= 0)) {
                 rightClickTimer.stop()
                 mouse.accepted = false
             }
         }
         onClicked: mouse => {
-            if (mouse.button === Qt.RightButton)
+            if (mouse.button === Qt.RightButton && root.cfg.stockBatteryWidgetId > 0)
                 rightClickTimer.start()
             else if (mouse.button === Qt.MiddleButton)
                 root.showDetails = !root.showDetails

@@ -1,0 +1,92 @@
+# plasma-power-monitor
+
+Per-battery charging info for dual-battery laptops (ThinkPad T480 and
+friends) on Linux, as a terminal command and a KDE Plasma 6 tray widget.
+
+The stock Plasma battery applet shows one combined percentage. When you
+have an internal and a rear battery, that hides the useful bits: which
+one is charging, how fast, and whether one has silently stopped
+reporting.
+
+![Power Monitor in the system tray](docs/tray.png)
+
+## `batt`
+
+```
+$ batt
+AC: plugged in    22:10:38
+
+BAT   STATUS          CHG          ENERGY    POWER    VOLT  HEALTH  CYCLE  THRESH ETA
+BAT0  Not charging    64%  15.39/23.94Wh    0.00W  11.46V    100%      3  96-100 waiting turn
+BAT1  Charging        23%  16.58/71.04Wh   28.52W  11.22V    100%      5  96-100 1h54m to 100%
+
+Total battery power: 28.52W
+```
+
+| Command | |
+|---|---|
+| `batt` | table once |
+| `batt -w [s]` | live view, refresh every `s` seconds (default 5) |
+| `batt --panel` | one line: `INT: 64% · EXT: ▲ 23% · 28.5W` |
+| `batt --raw` | one line per battery: `name status capacity energy_now energy_full power_now` (µWh/µW) |
+
+The ETA column explains "Not charging": ThinkPads charge one battery at
+a time (`waiting turn`), and charge thresholds stop a battery from
+starting until it drops below the start threshold (`waits until <40%`).
+
+Reads everything from `/sys/class/power_supply`; no root needed.
+
+## Power Monitor widget
+
+A tray icon showing the combined charge, plus a readout popup:
+
+| Click | Does |
+|---|---|
+| Left | show / hide the `INT · EXT · W` readout above the icon. It stays up until you click again, and is remembered across logins |
+| Middle | switch the popup to the full `batt` table |
+| Right | open the stock *Power and Battery* popup (power profiles, brightness, sleep inhibit) |
+| Double right | the normal widget menu (Configure…, Remove) |
+
+Settings (double right-click → *Configure Power Monitor…*): refresh
+interval, battery labels, arrows / watts on or off, the stock battery
+widget ID, and the path to `batt`.
+
+### Install
+
+Needs Plasma 6, `kpackagetool6`, `qdbus6`.
+
+```
+git clone https://github.com/mlemle128/plasma-power-monitor
+cd plasma-power-monitor
+./install.sh
+```
+
+Then:
+
+1. Right-click the tray's ^ → *Configure System Tray* → *Entries* and
+   set **Power Monitor** to *Always shown*.
+2. Run `./setup-right-click.sh` (add `--hide-stock` to also move the
+   stock battery icon into the ^ menu).
+
+`setup-right-click.sh` exists because Plasma has no way for one widget
+to open another's popup except through that widget's global
+*activate widget N* shortcut. The script finds the stock battery
+widget, gives it a shortcut if it has none (default
+`Meta+Ctrl+Alt+Shift+B`, override with `SHORTCUT=...`), and stores its
+ID in Power Monitor's settings. It restarts plasmashell and backs up
+`~/.config/plasma-org.kde.plasma.desktop-appletsrc` first. Until it's
+run, right-click just shows the widget menu.
+
+### Notes
+
+- The tray sorts icons alphabetically by name within a category, which
+  is why the widget is called *Power Monitor*: it lands right after
+  *Networks*, next to the ^.
+- `BAT0` is labelled INT and any other battery EXT; both labels are
+  configurable.
+- Tested on a ThinkPad T480 (internal + rear battery), Arch Linux,
+  Plasma 6.7.
+
+## License
+
+MIT

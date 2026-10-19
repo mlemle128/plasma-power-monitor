@@ -24,8 +24,9 @@
         <entry name="showPower" type="Bool">
             <default>true</default>
         </entry>
+        <!-- 0 = not set up; run setup-right-click.sh -->
         <entry name="stockBatteryWidgetId" type="Int">
-            <default>26</default>
+            <default>0</default>
         </entry>
         <entry name="battPath" type="String">
             <default>~/.local/bin/batt</default>

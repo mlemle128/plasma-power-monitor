@@ -58,7 +58,7 @@ KCM.SimpleKCM {
         QQC2.SpinBox {
             id: stockBatteryWidgetId
             Kirigami.FormData.label: "Stock battery widget ID:"
-            from: 1
+            from: 0
             to: 9999
         }
 
@@ -66,7 +66,7 @@ KCM.SimpleKCM {
             Layout.maximumWidth: Kirigami.Units.gridUnit * 22
             wrapMode: Text.WordWrap
             font: Kirigami.Theme.smallFont
-            text: "Right-click opens this tray widget through its \"activate widget N\" global shortcut. Only change it if the stock battery widget is re-added."
+            text: "Right-click opens this tray widget through its \"activate widget N\" global shortcut. 0 means not set up: right-click then just shows the widget menu. setup-right-click.sh fills this in."
         }
 
         QQC2.TextField {
