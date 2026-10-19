@@ -1,0 +1,21 @@
+{
+    "KPlugin": {
+        "Id": "io.github.mlemle128.powermonitor",
+        "Name": "Power Monitor",
+        "Description": "Per-battery charge, power and ETA from the batt script",
+        "Icon": "battery-good-charging",
+        "Category": "System Information",
+        "Authors": [
+            {
+                "Name": "mlemle128"
+            }
+        ],
+        "License": "MIT",
+        "Version": "1.0",
+        "Website": "https://github.com/mlemle128/plasma-power-monitor"
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-NotificationArea": "true",
+    "X-Plasma-NotificationAreaCategory": "Hardware"
+}
